@@ -5,6 +5,8 @@ import yaml
 import json
 import re
 import numpy as np
+import generate_prompt
+import subprocess
 import pickle #idk
 import torch.nn as nn
 import copy
@@ -84,19 +86,23 @@ for images in os.listdir(folder_dir):
         image_name = os.path.splitext(images)[0]
         gptclient =    image_transcriber.create_bedrock_client(None, 'us-east-1')
         #add access to prompt later
-        gptinvoke = image_transcriber.invoke_bedrock_model(gptclient, 'gpt', image_info,prompt )
+        prompt1 = subprocess.run(["uv", "run","python", "generate_prompt.py", "--model", "gpt"]) 
+        gptinvoke = image_transcriber.invoke_bedrock_model(gptclient, 'gpt', image_info,prompt1 )
         gptresponse = image_transcriber.format_output(gptinvoke, 'gpt', image_info)
         
 
         claudeclient = image_transcriber.create_bedrock_client(None, 'us-east-1')
-        claudeinvoke =image_transcriber.invoke_bedrock_model(claudeclient,'us.anthropic.claude-sonnet-4-5-20250929-v1:0', image_info, prompt)
+        prompt2 = subprocess.run(["uv", "run","python", "generate_prompt.py", "--model", "claude"]) 
+        claudeinvoke =image_transcriber.invoke_bedrock_model(claudeclient,'us.anthropic.claude-sonnet-4-5-20250929-v1:0', image_info, prompt2)
         clauderesponse = image_transcriber.format_output(claudeinvoke, 'us.anthropic.claude-sonnet-4-5-20250929-v1:0', image_info)
        
              
         geminiclient = image_transcriber.create_vertex_client(project_id,'us-central1', 'gemini-3.6-flash' )
-        geminiinvoke =  image_transcriber.create_vertex_client(geminiclient, 'gemini-3.6-flash', image_info, prompt )
+        prompt3 = subprocess.run(["uv", "run","python", "generate_prompt.py", "--model", "gemini"]) 
+        geminiinvoke =  image_transcriber.create_vertex_client(geminiclient, 'gemini-3.6-flash', image_info, prompt3 )
         geminiresponse = image_transcriber.format_output(geminiinvoke, 'gemini-3.6-flash',image_info )
-      
+        
+        
              
         #churro attempt
         backend = build_ocr_backend(OCRBackendSpec(
@@ -149,6 +155,113 @@ for images in os.listdir(folder_dir):
             raise ValueError(f"Failed to load image '{images}': {str(e)}")
 
     #combine images with their actual transcription
+
+for row in dev_ds_Dt:
+     image_info = image_transcriber.load_and_encode_image(image)
+     gptclient =    image_transcriber.create_bedrock_client(None, 'us-east-1')
+             #add access to prompt later
+     prompt1 = subprocess.run(["uv", "run","python", "generate_prompt.py", "--model", "gpt"]) 
+     gptinvoke = image_transcriber.invoke_bedrock_model(gptclient, 'gpt', image_info,prompt1 )
+     gptresponse = image_transcriber.format_output(gptinvoke, 'gpt', image_info)
+             
+     
+     claudeclient = image_transcriber.create_bedrock_client(None, 'us-east-1')
+     prompt2 = subprocess.run(["uv", "run","python", "generate_prompt.py", "--model", "claude"]) 
+     claudeinvoke =image_transcriber.invoke_bedrock_model(claudeclient,'us.anthropic.claude-sonnet-4-5-20250929-v1:0', image_info, prompt2)
+     clauderesponse = image_transcriber.format_output(claudeinvoke, 'us.anthropic.claude-sonnet-4-5-20250929-v1:0', image_info)
+            
+                  
+     geminiclient = image_transcriber.create_vertex_client(project_id,'us-central1', 'gemini-3.6-flash' )
+     prompt3 = subprocess.run(["uv", "run","python", "generate_prompt.py", "--model", "gemini"]) 
+     geminiinvoke =  image_transcriber.create_vertex_client(geminiclient, 'gemini-3.6-flash', image_info, prompt3 )
+     geminiresponse = image_transcriber.format_output(geminiinvoke, 'gemini-3.6-flash',image_info )
+             
+             
+                  
+             #churro attempt
+     backend = build_ocr_backend(OCRBackendSpec(
+        provider="hf",
+             model="stanford-oval/churro-3B",
+         )
+     )
+     #obv change image path
+     page = OCRClient(backend).ocr_image(row["image"])
+     
+          
+     condition = transcript_info["filename"] == image_name
+     if condition.any():
+                  transcript_info.loc[condition, "gpt_trans"] = gptresponse
+                  transcript_info.loc[condition, "claude_trans"] = clauderesponse
+                  transcript_info.loc[condition, "gemini_trans"] = geminiresponse
+                  transcript_info.loc[condition, "churro_trans"] = page.text
+     else:
+                  new_row = {
+                        "filename": np.nan,
+                         "gpt_trans": gptresponse,
+                         "claude_trans": clauderesponse,
+                         "gemini_trans": geminiresponse,
+                         "churro_trans": page.text,
+                         "kraken_trans": np.nan,
+                         "tesseract_trans": np.nan
+         }
+     
+     transcript_info = pd.concat(
+                      [transcript_info, pd.DataFrame([new_row])],ignore_index=True)
+     
+for row in test_ds_Dt:
+     image_info = image_transcriber.load_and_encode_image(image)
+     gptclient =    image_transcriber.create_bedrock_client(None, 'us-east-1')
+             #add access to prompt later
+     prompt1 = subprocess.run(["uv", "run","python", "generate_prompt.py", "--model", "gpt"]) 
+     gptinvoke = image_transcriber.invoke_bedrock_model(gptclient, 'gpt', image_info,prompt1 )
+     gptresponse = image_transcriber.format_output(gptinvoke, 'gpt', image_info)
+             
+     
+     claudeclient = image_transcriber.create_bedrock_client(None, 'us-east-1')
+     prompt2 = subprocess.run(["uv", "run","python", "generate_prompt.py", "--model", "claude"]) 
+     claudeinvoke =image_transcriber.invoke_bedrock_model(claudeclient,'us.anthropic.claude-sonnet-4-5-20250929-v1:0', image_info, prompt2)
+     clauderesponse = image_transcriber.format_output(claudeinvoke, 'us.anthropic.claude-sonnet-4-5-20250929-v1:0', image_info)
+            
+                  
+     geminiclient = image_transcriber.create_vertex_client(project_id,'us-central1', 'gemini-3.6-flash' )
+     prompt3 = subprocess.run(["uv", "run","python", "generate_prompt.py", "--model", "gemini"]) 
+     geminiinvoke =  image_transcriber.create_vertex_client(geminiclient, 'gemini-3.6-flash', image_info, prompt3 )
+     geminiresponse = image_transcriber.format_output(geminiinvoke, 'gemini-3.6-flash',image_info )
+             
+             
+                  
+             #churro attempt
+     backend = build_ocr_backend(OCRBackendSpec(
+        provider="hf",
+             model="stanford-oval/churro-3B",
+         )
+     )
+     #obv change image path
+     page = OCRClient(backend).ocr_image(row["image"])
+     
+          
+     condition = transcript_info["filename"] == image_name
+     if condition.any():
+                  transcript_info.loc[condition, "gpt_trans"] = gptresponse
+                  transcript_info.loc[condition, "claude_trans"] = clauderesponse
+                  transcript_info.loc[condition, "gemini_trans"] = geminiresponse
+                  transcript_info.loc[condition, "churro_trans"] = page.text
+     else:
+                  new_row = {
+                        "filename": np.nan,
+                         "gpt_trans": gptresponse,
+                         "claude_trans": clauderesponse,
+                         "gemini_trans": geminiresponse,
+                         "churro_trans": page.text,
+                         "kraken_trans": np.nan,
+                         "tesseract_trans": np.nan
+         }
+     
+     transcript_info = pd.concat(
+                      [transcript_info, pd.DataFrame([new_row])],ignore_index=True)               
+      
+      
+
 
 #e version with ground truth - call accuracy here
 condition = transcript_info["transcription"].notna()
