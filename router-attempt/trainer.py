@@ -7,9 +7,8 @@ import re
 import numpy as np
 import generate_prompt
 import subprocess
-import model_loader
-import pickle #idk
-import torch.nn as nn
+#import model_loader
+#import torch.nn as nn
 import copy
 from sklearn.svm import SVC
 from PIL import Image
@@ -27,30 +26,29 @@ from botocore.exceptions import NoCredentialsError, ClientError, BotoCoreError
 #def invoke_vertex_model(client_and_model: tuple, image_data_list: list, prompt: str) -> dict:
 # data setup here
 #def load_dataset():
+
 from datasets import load_dataset
 # check for only english - also need to figure out pandas combo
-#train_ds = load_dataset("stanford-oval/churro-dataset", split="train")
+
 #potentially only use these last two but there might be a point in using the train version as well
 test_ds = load_dataset("stanford-oval/churro-dataset", split="test")
 dev_ds = load_dataset("stanford-oval/churro-dataset", split="dev")
 dev_ds_Dt = dev_ds.to_pandas()
-#train_ds_Dt = train_ds.to_pandas()
+print(dev_ds_Dt.columns)
 test_ds_Dt = test_ds.to_pandas()
 dev_ds_Dt = dev_ds_Dt.drop(columns={'dataset_id', 'languages', 'main_script', 'original_transcription', 'scripts'})
 dev_ds_Dt = dev_ds_Dt.rename(columns={"cleaned_transcription": "transcription"})
 test_ds_Dt =test_ds_Dt.drop(columns={'dataset_id', 'languages', 'main_script', 'original_transcription', 'scripts' })
 test_ds_Dt =test_ds_Dt.rename(columns={"cleaned_transcription": "transcription"})
-#train_ds_Dt =train_ds_Dt.drop(columns={'dataset_id', 'example_id', 'languages', 'main_script', 'original_transcription', 'scripts'})
+
 #filter for english, german, dutch
-dev_ds_Dt = dev_ds_Dt.filter(items="German")
-test_ds_Dt = test_ds_Dt.filter(items={"English", "German", "Dutch"})
-#train_ds_Dt = train_ds_Dt.filter(items={"English", "German", "Dutch"})
 
 transcript_info = pd.read_csv("newberry-transcriptions20260407.csv")
 transcript_info = transcript_info.drop(columns={'title','permalink', 'translation'})
 transcript_info["filename"] = transcript_info["filename"].str.split(".", n=1).str[0]
-frame = [transcript_info, dev_ds_Dt, test_ds_Dt]
-transcript_info =pd.merge(frame)
+transcript_info =transcript_info.merge(dev_ds_Dt,left_on="transcription",right_on="transcription")
+transcript_info=transcript_info.merge(test_ds_Dt,left_on="transcription",right_on="transcription")
+transcript_info=transcript_info.filter(items=["English", "German", "Dutch"])
 transcript_info['gemini_trans'] = np.nan
 transcript_info['claude_trans'] = np.nan
 transcript_info['gpt_trans'] = np.nan
@@ -76,15 +74,17 @@ transcript_info['churro_judge'] = {"cer": np.nan, "wer": np.nan, "similarity": n
 transcript_info['final_judge'] = np.nan #use this to determine model name
 #potentially change to be specifically the list of items in 
 #figure out profile
-folder_dir = "C:/Users/lenab/OneDrive/Pictures/Screenshots/school/cop4934/router-attempt/2026Jul22 - 836 files"
+#folder_dir = "C:/Users/lenab/OneDrive/Pictures/Screenshots/school/cop4934/router-attempt/2026Jul22 - 836 files"
+folder_dir = "/home/handwritingTranscriptSD/Desktop/Handwriting-Development/historical-image-transcription-script/router-attempt/2026Jul22 - 836 files"
 for images in os.listdir(folder_dir):
    
     try:
         image_path = os.path.join(folder_dir, images)
         image = Image.open(image_path)
         image.load()
-        image_info = image_transcriber.load_and_encode_image(image)
+        
         image_name = os.path.splitext(images)[0]
+        image_info = image_transcriber.load_and_encode_image(image_name)
         gptclient =    image_transcriber.create_bedrock_client(None, 'us-east-1')
         #add access to prompt later
         prompt1 = subprocess.run(["uv", "run","python", "generate_prompt.py", "--model", "gpt"]) 
@@ -136,10 +136,12 @@ for images in os.listdir(folder_dir):
                  [transcript_info, pd.DataFrame([new_row])],ignore_index=True)
 
              
-  #add 
+  #def change error message
     except FileNotFoundError:
             # Re-raise with more context
+            continue
             raise FileNotFoundError(f"Image file not found: {images}")
+            
     except PermissionError:
             raise PermissionError(
                 f"Permission denied: Cannot read image file '{images}'. "
@@ -159,10 +161,10 @@ for images in os.listdir(folder_dir):
     #combine images with their actual transcription
 
 for row in dev_ds_Dt:
-     image = Image.open(row["image"])
+     image = Image.open(row["example_id"])
      image.load()
-     image_info = image_transcriber.load_and_encode_image(image)
      image_name = row["example_id"]
+     image_info = image_transcriber.load_and_encode_image(image_name)
      gptclient =    image_transcriber.create_bedrock_client(None, 'us-east-1')
              #add access to prompt later
      prompt1 = subprocess.run(["uv", "run","python", "generate_prompt.py", "--model", "gpt"]) 
@@ -453,4 +455,5 @@ def update_yaml_with_env_vars(file_path, env_vars):
 
     with open(file_path, "w") as file:
         yaml.dump(yaml_content, file)
+
 
