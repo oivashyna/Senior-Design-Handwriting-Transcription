@@ -7,6 +7,7 @@ import re
 import numpy as np
 import generate_prompt
 import subprocess
+import model_loader
 import pickle #idk
 import torch.nn as nn
 import copy
@@ -35,9 +36,9 @@ dev_ds = load_dataset("stanford-oval/churro-dataset", split="dev")
 dev_ds_Dt = dev_ds.to_pandas()
 #train_ds_Dt = train_ds.to_pandas()
 test_ds_Dt = test_ds.to_pandas()
-dev_ds_Dt = dev_ds_Dt.drop(columns={'dataset_id', 'example_id', 'languages', 'main_script', 'original_transcription', 'scripts'})
+dev_ds_Dt = dev_ds_Dt.drop(columns={'dataset_id', 'languages', 'main_script', 'original_transcription', 'scripts'})
 dev_ds_Dt = dev_ds_Dt.rename(columns={"cleaned_transcription": "transcription"})
-test_ds_Dt =test_ds_Dt.drop(columns={'dataset_id', 'example_id', 'languages', 'main_script', 'original_transcription', 'scripts' })
+test_ds_Dt =test_ds_Dt.drop(columns={'dataset_id', 'languages', 'main_script', 'original_transcription', 'scripts' })
 test_ds_Dt =test_ds_Dt.rename(columns={"cleaned_transcription": "transcription"})
 #train_ds_Dt =train_ds_Dt.drop(columns={'dataset_id', 'example_id', 'languages', 'main_script', 'original_transcription', 'scripts'})
 #filter for english, german, dutch
@@ -87,6 +88,7 @@ for images in os.listdir(folder_dir):
         gptclient =    image_transcriber.create_bedrock_client(None, 'us-east-1')
         #add access to prompt later
         prompt1 = subprocess.run(["uv", "run","python", "generate_prompt.py", "--model", "gpt"]) 
+        #change to be converse
         gptinvoke = image_transcriber.invoke_bedrock_model(gptclient, 'gpt', image_info,prompt1 )
         gptresponse = image_transcriber.format_output(gptinvoke, 'gpt', image_info)
         
@@ -157,7 +159,10 @@ for images in os.listdir(folder_dir):
     #combine images with their actual transcription
 
 for row in dev_ds_Dt:
+     image = Image.open(row["image"])
+     image.load()
      image_info = image_transcriber.load_and_encode_image(image)
+     image_name = row["example_id"]
      gptclient =    image_transcriber.create_bedrock_client(None, 'us-east-1')
              #add access to prompt later
      prompt1 = subprocess.run(["uv", "run","python", "generate_prompt.py", "--model", "gpt"]) 
@@ -188,7 +193,7 @@ for row in dev_ds_Dt:
      page = OCRClient(backend).ocr_image(row["image"])
      
           
-     condition = transcript_info["filename"] == image_name
+     condition = transcript_info["image"] == image_name
      if condition.any():
                   transcript_info.loc[condition, "gpt_trans"] = gptresponse
                   transcript_info.loc[condition, "claude_trans"] = clauderesponse
@@ -196,7 +201,7 @@ for row in dev_ds_Dt:
                   transcript_info.loc[condition, "churro_trans"] = page.text
      else:
                   new_row = {
-                        "filename": np.nan,
+                        
                          "gpt_trans": gptresponse,
                          "claude_trans": clauderesponse,
                          "gemini_trans": geminiresponse,
@@ -209,7 +214,10 @@ for row in dev_ds_Dt:
                       [transcript_info, pd.DataFrame([new_row])],ignore_index=True)
      
 for row in test_ds_Dt:
+     image = Image.open(row["image"])
+     image.load()
      image_info = image_transcriber.load_and_encode_image(image)
+     image_name = row["example_id"]
      gptclient =    image_transcriber.create_bedrock_client(None, 'us-east-1')
              #add access to prompt later
      prompt1 = subprocess.run(["uv", "run","python", "generate_prompt.py", "--model", "gpt"]) 
@@ -248,7 +256,7 @@ for row in test_ds_Dt:
                   transcript_info.loc[condition, "churro_trans"] = page.text
      else:
                   new_row = {
-                        "filename": np.nan,
+                       
                          "gpt_trans": gptresponse,
                          "claude_trans": clauderesponse,
                          "gemini_trans": geminiresponse,
@@ -332,14 +340,16 @@ from transformers import (
     Trainer,
     DataCollatorForLanguageModeling
 )
+#study the causal llm router for better implementation
 def tokenize_function(examples):
-    return tokenizer(
-        examples["text"],
-        truncation=True,
-        max_length=512,
-    )
+            tokenized = self.tokenizer(
+                examples["full_text"],
+                truncation=True,
+                max_length=self.model_config.get("max_length", 512),
+                padding="max_length"
+            )
 
-tokenized_dataset = dataset.map(
+tokenized_dataset = transcript_info.map(
     tokenize_function,
     batched=True,
     remove_columns=["text"]
@@ -444,52 +454,3 @@ def update_yaml_with_env_vars(file_path, env_vars):
     with open(file_path, "w") as file:
         yaml.dump(yaml_content, file)
 
-
-
-
-#save - figure out path item
-def save_model(model: Any, filepath: str) -> bool:
-    """
-    Save a model to either .pt (PyTorch) or .pkl (pickle) file format.
-    Automatically detects file type from the file extension.
-
-    Args:
-        model: The model object to be saved
-        filepath: Full path including filename and extension (.pt or .pkl)
-
-    Returns:
-        bool: True if save was successful, False otherwise
-
-    Raises:
-        ValueError: If file extension is not supported
-        Exception: If the save operation fails
-    """
-    try:
-        # Convert to Path object for easier manipulation
-        file_path: Path = Path(filepath)
-
-        # Create directory if it doesn't exist
-        directory: Path = file_path.parent
-        if not directory.exists():
-            directory.mkdir(parents=True, exist_ok=True)
-            print(f"Created directory: {directory}")
-
-        # Determine file type from extension
-        extension: str = file_path.suffix.lower()
-
-        # Save based on file extension
-        if extension == ".pt":
-            torch.save(model, filepath)
-            print(f"Successfully saved PyTorch model: {filepath}")
-        elif extension == ".pkl":
-            with open(filepath, 'wb') as file_handle:
-                pickle.dump(model, file_handle)
-            print(f"Successfully saved pickle model: {filepath}")
-        else:
-            raise ValueError(f"Unsupported file extension: {extension}. Use .pt or .pkl")
-
-        return True
-
-    except Exception as error:
-        print(f"Error saving model to {filepath}: {str(error)}")
-        return False
