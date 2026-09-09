@@ -1,0 +1,60 @@
+<HistoricalDocument xmlns="http://example.com/historicaldocument">
+  <Metadata>
+    <Language>English</Language>
+    <WritingDirection>ltr</WritingDirection>
+    <PhysicalDescription>Paper, 1 page, handwritten.</PhysicalDescription>
+    <Description>Letter discussing meetings and appointments related to the Society.</Description>
+    <Script>Latin</Script>
+  </Metadata>
+  <Page>
+    <Header>
+      <Heading type="other">
+        <Line>[F H: &amp; E B: 86].</Line>
+      </Heading>
+      <PageNumber>38</PageNumber>
+    </Header>
+    <Body>
+      <MarginalNote placement="left_margin">
+        <Line>Deare brotheren:</Line>
+      </MarginalNote>
+      <Paragraph>
+        <Line>In the life that Doth Endure &amp; the Love to <Emphasis type="underline">th</Emphasis> protodes, from</Line>
+        <Line>him that Doth us Reooper &amp; Deliver; doe I <Addition>your</Addition> Salute</Line>
+        <Line>&amp; therin Injoy: I Am now at Swartmore; And since</Line>
+        <Line>I Came hither (this <Emphasis type="underline">Th</Emphasis> of ye <Emphasis type="underline">8t</Emphasis>) I heard that There</Line>
+        <Line>is A Letter or word come; That I Should with Speed</Line>
+        <Line>come vp to London; But this is to Certifie; That by</Line>
+        <Line>the way as I Came; I Left word for A meeting to be</Line>
+        <Line>about Sad Bur; the next fourth day of ye weeke: And</Line>
+        <Line>it is Appoinled A general meeting yeabouts: And</Line>
+        <Line>also, one generall meeting, at Eldrich, on ye 6<Emphasis type="underline">th</Emphasis></Line>
+        <Line>day after; And A meeting, to be At Scolhouse.</Line>
+        <Line>on ye first day after that; And for A meeting to</Line>
+        <Line>be at Doctor Hodgshons: on ye 3<Emphasis type="underline">d</Emphasis> day after that.</Line>
+        <Line>Those meetings are Appoinled, vols of ye Lord grant</Line>
+        <Line>I Am to be at; And did order the Appoinling of</Line>
+        <Line>them (soe to be) in ye way of my Coming hither;</Line>
+        <Line>That I might Endeavour to Returne shortly againe</Line>
+        <Line>into Yorkshire; Expecting That there will be some</Line>
+        <Line>business for me here, about John Taylor: whom I</Line>
+        <Line>writt to Robt Rich to Enguider after; &amp;c: And before</Line>
+        <Line>I Come out of Yorkshire; I ordered John Killom &amp;</Line>
+        <Line>one or 2 more for to goe into Lincolnshire; to</Line>
+        <Line>search out the matter of disorder occasioned by</Line>
+        <Line>John Taylor; That if he Come downe; they</Line>
+        <Line>may be A meeting Concerning the same; And</Line>
+        <Line>moreover I Left word with John Killom; That if</Line>
+        <Line>he either will with John Taylor; or heard of his Returne</Line>
+        <Line>to his outward house &amp;c: that With 3. weeks after</Line>
+        <Line>he was come or ye abonts A meeting should be</Line>
+        <Line>Appoinled, to Enguider into ye things done by ye</Line>
+        <Line>Said John Taylor; That Deciyst may be condemned &amp;</Line>
+        <Line>the truth Justified. And likewise before I Came</Line>
+        <Line>from Bath; It was ordered (A word sent to give</Line>
+        <Line>notice) That one of ye Church (in Yorkshire, Lincolnshire</Line>
+        <Line>or bishop &amp; noting yonshier) Should Aprooued Amongst them</Line>
+        <Line>that were meet in the <Illegible reason="blot" extent="ca. 1 word"/> the 9<Emphasis type="underline">th</Emphasis> month; So.</Line>
+      </Paragraph>
+    </Body>
+  </Page>
+</HistoricalDocument>

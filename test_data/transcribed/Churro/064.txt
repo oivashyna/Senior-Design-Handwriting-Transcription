@@ -1,0 +1,57 @@
+<HistoricalDocument xmlns="http://example.com/historicaldocument">
+  <Metadata>
+    <Language>English</Language>
+    <WritingDirection>ltr</WritingDirection>
+    <PhysicalDescription>Paper, 1 page, handwritten.</PhysicalDescription>
+    <Description>Letter from Josiah Cole discussing a prisoner, political matters, and personal news.</Description>
+    <Script>Latin</Script>
+  </Metadata>
+  <Page>
+    <Body>
+      <Paragraph>
+        <Line>and gant th'ill Chonge if non must come at us but only to bring in our victuails, and ye do not much</Line>
+        <Line>what we say, and yet ye will doe not write though way is made for this Contraige to the poor</Line>
+        <Line>unwolodg) and ye prison way are Configured to doe not afforde us the benefit of a</Line>
+        <Line>Chimney, nor d heas of ofite, which is sore chingante, but ye prove of ye true god</Line>
+        <Line>almighty is about it all, and out of all, in which wee are well content, and</Line>
+        <Line>our at peace, and rest, and this prison is to mee as al paloss of pleasure</Line>
+        <Line>though wee are as Rauous nothing, great possessing all things I am sure</Line>
+        <Line> hath loved us, and gant him selfe for us, by whos blood not one ransom do</Line>
+        <Line>some ye have in ye New Souuarenty of life foreuers, Glory be unto the Lord</Line>
+        <Line>god almighty forever, + thine Illustre George, O what luy may ye</Line>
+        <Line>permittee to doe for thee ye do, I doe nob ye do but, though there I know</Line>
+        <Line>the rage of som of them is very great, and are bent to doe nothing they</Line>
+        <Line>do talk to us of ye oath; but if they can finde our housses I suppose</Line>
+        <Line>they will take them, and send us out of town, but, if not, I cannot tell</Line>
+        <Line>(nayther doe I believe) what they will do what they will do, or what</Line>
+        <Line>Routrue Muth is shiring in ye minds of most people, agaunt the governtour</Line>
+        <Line>and Inhuman dealing ye do us soe Cloutie in suth el Could smel my</Line>
+        <Line>plate, alt such a season of ye yeare, for they will not allow us to be real</Line>
+        <Line>econom when al Chiming is though it be not otherways made us of; but ye</Line>
+        <Line>royd over our heads. + indeed ye one of ye Maidshrels of ye town did</Line>
+        <Line>proffer ye mayor to be bound body for bodies for ye yeere might be al</Line>
+        <Line>som Chamber in the town, fitt for men, but it would not be attemptt</Line>
+        <Line>but wee are content, and so well ouer it; I had intentions and desires to have</Line>
+        <Line>seen thee, after school time, had I not been on this aiss hindend, but I cannot</Line>
+        <Line>tell now how long it may be; Neover the less, if thou writte anything to</Line>
+        <Line>me, and Convey it to Margery Chipsham for mee, shee will be Coysell</Line>
+        <Line>to send it to me, and indeed I should be glad to hear from thee ye</Line>
+        <Line>I desire thee to salut mee kindly in the Lord's bo. elliff and ye yeast of ye fellow</Line>
+        <Line>persons: and in ye Lord, and peace of god I remayne,</Line>
+      </Paragraph>
+      <MarginalNote placement="left_margin">
+        <Line>Laddy Hambly and her sisters wth the Lords</Line>
+        <Line>and his mother desired mee to send</Line>
+        <Line>you ye gratiation of they love into their</Line>
+        <Line>also Ben. Laurens salutes thee dearly</Line>
+      </MarginalNote>
+      <Paragraph>
+        <Line>Thine to serve thy</Line>
+        <Line>Josiah Cole</Line>
+      </Paragraph>
+      <MarginalNote placement="right_margin">
+        <Line>Josiah Cole</Line>
+      </MarginalNote>
+    </Body>
+  </Page>
+</HistoricalDocument>

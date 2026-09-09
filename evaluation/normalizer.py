@@ -22,3 +22,30 @@ def normalize_for_accuracy(text: str) -> str:
     text = re.sub(r"\^", "", text)
     text = re.sub(r"\s+", " ", text)
     return text.strip()
+
+# FILTER EDITORIAL LINES
+def filter_editorial_lines(text: str) -> str:
+    """
+    Removes lines that are likely editorial notes, not part of the transcription.
+
+    Removes:
+        - Lines that are entirely bracketed e.g. (ffsH: [Francis Howgill]...)
+        - Lines that are purely a page number (just digits)
+    """
+
+    lines = text.split("\n")
+    filtered = []
+    for line in lines:
+        stripped = line.strip()
+        if re.fullmatch(r'\d+', stripped):
+            continue  # Skip lines that are (page numbers)
+
+        if stripped.startswith("(") and stripped.endswith(")"):
+            inner = stripped[1:-1]
+            cleaned = re.sub(r'\[.*?\]', '', inner)
+            cleaned = re.sub(r'&\w*:?', '', cleaned)
+            cleaned = re.sub(r'\s+', '', cleaned)
+            if not cleaned:
+                continue
+        filtered.append(line)
+    return "\n".join(filtered)

@@ -29,7 +29,7 @@ Converts to lowercase, removes annotation markers i.e. (`[illegible]`,`<unclear>
 Matches reference and prediction lines using sequence alignment (difflib). Handles real model failure modes, merged, split, skipped, and hallucinated extra lines currently.
 
 `scorer.py`
-The core scoring logic. Takes reference and prediction text, returns CER, WER, BLEU per lines plus a summary. This is the main file other modules import.
+The core scoring logic. Takes reference and prediction text, returns CER, WER, BLEU, and similarity per lines plus a summary. This is the main file other modules import.
 
 `flagging.py`
 Determine whether lines needs human review based on its CER score. Default threshold is 10%.
@@ -53,16 +53,29 @@ This extracts plain text from ALTO XML and PAGE XML files. This is an extra file
 | WER    | Word Error Rate               | 0%+     | Lower     |
 | BLEU   | N-gram overlap with reference | 0.0–1.0 | Higher    |
 
-**CER quality scale (handwriting only, not printed text):**
+### CER quality scale (established benchmarks):
 
-| CER       | Meaning       |
-| --------- | ------------- |
-| Below 3%  | Excellent     |
-| 3–5%      | Very good     |
-| 5–8%      | Good          |
-| 8–10%     | Decent        |
-| 10–15%    | Barely usable |
-| Above 15% | Unusable      |
+| CER       | Quality   |
+| --------- | --------- |
+| 0%        | Perfect   |
+| Below 5%  | Excellent |
+| 5–15%     | Good      |
+| 15–30%    | Fair      |
+| Above 30% | Poor      |
+
+### WER
+
+| WER       | Quality   |
+| --------- | --------- |
+| 0%        | Perfect   |
+| Below 10% | Excellent |
+| 10–25%    | Good      |
+| 25–50%    | Fair      |
+| Above 50% | Poor      |
+
+### BLEU and Similarity
+
+No established HTR-specific quality benchmarks exist for these metrics in the literature. BLEU above 0.6 generally indicates good n-gram overlap. Similarity above 0.8 indicates high structural resemblance. Both are reported alongside CER for completeness but CER remains the primary metric.
 
 ---
 
@@ -73,6 +86,7 @@ This extracts plain text from ALTO XML and PAGE XML files. This is an extra file
 | Plain text | `.txt`          | Model output (Claude, GPT, Gemini, CHURRO, olmOCR) |
 | ALTO XML   | `.xml`, `.alto` | Transkribus export                                 |
 | PAGE XML   | `.xml`          | eScriptorium export                                |
+| CHURRO XML | `.txt`, `.xml`  | CHURRO HistoricalDocument format                   |
 
 Use `extract_text_from_file()` from `xml_parser.py` it handles all three formats automatically.
 
@@ -94,8 +108,8 @@ python -m pip install -r requirements.txt
 from evaluation.scorer import evaluate_lines
 from evaluation.xml_parser import extract_text_from_file
 
-reference  = extract_text_from_file("ground_truth/letter_001.xml")
-prediction = extract_text_from_file("transcribed/Claude/letter_001.txt")
+reference  = extract_text_from_file("ground_truth/038.txt")
+prediction = extract_text_from_file("transcribed/Churro/038.txt")
 
 result = evaluate_lines(reference, prediction)
 print(result["flagged_lines"])
@@ -103,3 +117,61 @@ print(result["total_lines"])
 ```
 
 ---
+
+## Usage
+
+Run evaluation against all documents in `test_data/`:
+
+```bash
+python main.py
+```
+
+Run evaluation against a specific document only:
+
+```bash
+python main.py --document 038.txt
+```
+
+The script automatically discovers all model folders in `test_data/transcribed/` and scores any model that has a matching filename. No configuration needed when adding new models or documents.
+
+---
+
+## Notes on Test Results
+
+### Structural Fidelity
+
+CER scores reflect structural fidelity as well as character accuracy.
+Models that reorder content (example placing marginal notes at the
+end of output when they appear mid-document in the original) will score
+higher CER. This is intentional: require transcription to
+preserve document structure as-is.
+
+### Ground Truth Format
+
+Current test GT files use scholarly diplomatic transcription with
+editorial annotations e.g. `[that]`, `[none]`, `[deletion]...[/deletion]`.
+These are stripped before scoring but their presence can still inflate
+CER slightly. Scores will be more accurate once CHDR produces GT in
+their own format.
+
+### File Naming Convention
+
+Ground truth and transcription files are matched by filename only.
+Files must refer to the same physical document the scorer has no
+way to detect a content mismatch. Always verify correspondence before
+interpreting scores.
+
+Example:
+ground_truth/038.txt
+transcribed/Churro/038.txt ← scored
+transcribed/Churro/055.txt ← skipped, no GT match
+
+---
+
+## Known Limitations
+
+- All models perform worse on non-English text
+- Digits and proper names are consistently the hardest to transcribe correctly
+- No ground truth path (LLM-as-judge) is planned but not yet implemented
+- XML confidence scores are parsed but not currently used by the scorer
+- GT format not yet standardized current test data uses scholarly annotations that may not reflect CHDR's final gold standard convention

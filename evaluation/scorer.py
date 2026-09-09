@@ -1,7 +1,8 @@
-from evaluation.normalizer import normalize_for_accuracy
+from evaluation.normalizer import normalize_for_accuracy, filter_editorial_lines
 from evaluation.flagging import flag_for_review
 from evaluation.aligner import align_lines
 from evaluation.highlighter import highlight_errors
+import rapidfuzz.fuzz as fuzz
 import jiwer
 import sacrebleu
 
@@ -9,6 +10,7 @@ import sacrebleu
 def evaluate_lines(reference_text: str, prediction_text: str) -> dict:
     """Scores each line individually instead of the whole document at once.
     Returns per-line results plus a summary."""
+    reference_text = filter_editorial_lines(reference_text)
     reference_lines = [l for l in reference_text.split("\n") if l.strip()]
     prediction_lines = [l for l in prediction_text.split("\n") if l.strip()]
 
@@ -29,6 +31,7 @@ def evaluate_lines(reference_text: str, prediction_text: str) -> dict:
                 "cer": result["cer"],
                 "wer": result["wer"],
                 "bleu": result["bleu"],
+                "similarity": result["similarity"],
             }
             if flagged:
                 flagged_count += 1
@@ -72,7 +75,8 @@ def evaluate_transcription(reference: str, prediction: str, normalize: bool = Fa
     wer = jiwer.wer(reference, prediction)
     cer = jiwer.cer(reference, prediction)
     bleu = sacrebleu.sentence_bleu(prediction, [reference]).score / 100.0
-    return {"cer": cer, "wer": wer, "bleu": bleu}
+    similarity = fuzz.ratio(prediction, reference) / 100.0
+    return {"cer": cer, "wer": wer, "bleu": bleu, "similarity": similarity}
 
 def evaluate_both(reference: str, prediction: str) -> dict:
     """Returns both raw and normalized scores side by side.

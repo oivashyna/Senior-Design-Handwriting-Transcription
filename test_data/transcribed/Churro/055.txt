@@ -1,0 +1,48 @@
+<HistoricalDocument xmlns="http://example.com/historicaldocument">
+  <Metadata>
+    <Language>English</Language>
+    <WritingDirection>ltr</WritingDirection>
+    <PhysicalDescription>Paper, 1 page, handwritten.</PhysicalDescription>
+    <Description>Letter from George Popham concerning his travels and observations in Holland and Germany, dated 25 January 1659.</Description>
+    <Script>Latin</Script>
+  </Metadata>
+  <Page>
+    <Header>
+      <PageNumber>55</PageNumber>
+    </Header>
+    <Body>
+      <Paragraph>
+        <Line><Initial type="simple">D</Initial>ear Geo: my sons is wont to live in the truth where I desire in my heart to be kept in</Line>
+        <Line>life &amp; power of God that I may fulfill the will of the God in what I am ende he calls me</Line>
+        <Line>unto and I hope I shall wholly sabbate abroad in two nations &amp; bee a good man unto them</Line>
+        <Line>&amp; to both men whose way is wise, things have chiefly throngh Holland are in good</Line>
+        <Line>order, &amp; meetings are for the most part pretty quiet, here is every first day a publicke meeting</Line>
+        <Line>at their houses, it is neare or about 3 quarters of a mile out of Amsterdam, &amp; of late there</Line>
+        <Line>have been all greate men &amp; land bones very quiet &amp; moderatly, &amp; the truth hath a greater</Line>
+        <Line>fame in this country, as it hath had formerly, yet dare not much appear openly to none it, and</Line>
+        <Line>in other Citties and places where friends are many are in life mander as bare amongst</Line>
+        <Line>them well de many Inqueries and some hasty Conviences, who doubt appeared in ournehal</Line>
+        <Line>tents, yet these have well done themselves, for they have not entertained her againe, where</Line>
+        <Line>she was before, &amp; bee &amp; her wife Cossels not amongst friends, but rather speakes well of</Line>
+        <Line>friends &amp; asks 2dly. habe tantum exiuidit &amp; 3dly this day came a letter out of</Line>
+        <Line>Hannover from Jo: Ambo. he writes that friends are in a good condition thence &amp; hands a good</Line>
+        <Line>authority in two towns &amp; that he &amp; John Higgsins shewed with the prince of the continent who</Line>
+        <Line>hopes to be very friendly to them &amp; looks at kindly that they come to see him &amp; gives him</Line>
+        <Line>a book of books, to wit general books of friends, printed in the Dutch tongue &amp; bound up</Line>
+        <Line>to gather, &amp; that he (William) is about Cornings away &amp; Cravenge John Higgsins to send for</Line>
+        <Line>a lynd amongst friends. william Caton is at or abouts Rotterdam, he writes that things are well</Line>
+        <Line>there, he hath been gone from this City about a week. He would that time he went I came</Line>
+        <Line>from Rotterdam &amp; other places that way where I was 2 or 3 weeks, much more I hand not to</Line>
+        <Line>witte only I think shipping will very shortly be ready to goe from this City for America</Line>
+        <Line>with which I hope to god, and I should be glad to hear from thee before I goe if I could</Line>
+        <Line>now Amsterdam</Line>
+      </Paragraph>
+      <DateLine>
+        <Line>25/ Jan: /1659/</Line>
+      </DateLine>
+      <Paragraph>
+        <Line>thy in my reverence Geo: Popham</Line>
+      </Paragraph>
+    </Body>
+  </Page>
+</HistoricalDocument>
